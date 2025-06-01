@@ -1,0 +1,27 @@
+name: Run tests
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**/*.ts'
+      - 'test/**/*.ts'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-alpine
+
+    steps:
+      - name: Install git
+        run: apk add --no-cache git
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
