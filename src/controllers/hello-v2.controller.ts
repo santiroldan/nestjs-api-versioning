@@ -1,6 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 
-@Controller({ path: 'hello', version: '2' })
+@Controller({path: 'hello', version: '2'})
 export class HelloV2Controller {
     @Get()
     getHelloV2() {

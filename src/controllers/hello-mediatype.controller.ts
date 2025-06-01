@@ -1,4 +1,4 @@
-import { Controller, Get, Version } from '@nestjs/common';
+import {Controller, Get, Version} from '@nestjs/common';
 
 @Controller('hello-media')
 export class HelloMediaTypeController {
