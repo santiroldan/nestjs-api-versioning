@@ -1,43 +1,45 @@
 import {NestFactory} from '@nestjs/core';
-import {VersioningType} from '@nestjs/common';
+import {VersioningOptions, VersioningType} from '@nestjs/common';
 import {AppUriModule} from './modules/app-uri.module';
 import {AppHeaderModule} from './modules/app-header.module';
 import {AppMediaTypeModule} from './modules/app-mediatype.module';
 import {AppCustomModule} from './modules/app-custom.module';
 
-async function bootstrap() {
-    const appUri = await NestFactory.create(AppUriModule);
-    appUri.enableVersioning({
-        type: VersioningType.URI,
-    });
-    await appUri.listen(3001);
-    console.log('✅ URI versioning server running at http://localhost:3001');
+async function bootstrapApp(
+    module: any,
+    port: number,
+    versioningConfig: VersioningOptions | undefined,
+    label: string,
+) {
+    const app = await NestFactory.create(module);
+    app.enableVersioning(versioningConfig);
+    await app.listen(port);
+    console.log(`✅ ${label} versioning server running at http://localhost:${port}`);
+}
 
-    const appHeader = await NestFactory.create(AppHeaderModule);
-    appHeader.enableVersioning({
+async function bootstrap() {
+    await bootstrapApp(AppUriModule, 3001, {
+        type: VersioningType.URI,
+    }, 'URI');
+
+    await bootstrapApp(AppHeaderModule, 3002, {
         type: VersioningType.HEADER,
         header: 'X-API-Version',
-    });
-    await appHeader.listen(3002);
-    console.log('✅ Header versioning server running at http://localhost:3002');
+    }, 'Header');
 
-    const appMedia = await NestFactory.create(AppMediaTypeModule);
-    appMedia.enableVersioning({
+    await bootstrapApp(AppMediaTypeModule, 3003, {
         type: VersioningType.MEDIA_TYPE,
-        key: 'v='
-    });
-    await appMedia.listen(3003);
-    console.log('✅ Media-Type versioning server running at http://localhost:3003');
+        key: 'v=',
+    }, 'Media-Type');
 
-
-    const appCustom = await NestFactory.create(AppCustomModule);
-    appCustom.enableVersioning({
+    await bootstrapApp(AppCustomModule, 3004, {
         type: VersioningType.CUSTOM,
         extractor: (req: any) =>
             req.headers['x-custom-version'] || req.headers['X-Custom-Version'] || '1',
-    });
-    await appCustom.listen(3004);
-    console.log('✅ Custom versioning server running at http://localhost:3004');
+    }, 'Custom');
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+    console.error('Error en bootstrap: ', error);
+    process.exit(1);
+});
