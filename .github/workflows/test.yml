@@ -6,6 +6,11 @@ on:
     paths:
       - 'src/**/*.ts'
       - 'test/**/*.ts'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**/*.ts'
+      - 'test/**/*.ts'
 
 jobs:
   test:
